@@ -38,12 +38,12 @@ public class Chunk extends Camera {
 
                 if (Utils.randInt(0, 10) <= 1) {
                     tiles[i][j] = new WaterTile(Tile.water, xPos, yPos);
-                    
+
                     // check if tile is edge tile and set boolean
                 } else {
                     tiles[i][j] = new GrassTile(Tile.grass, xPos, yPos);
-                    
-                 // check if tile is edge tile and set boolean
+
+                    // check if tile is edge tile and set boolean
                 }
             }
         }
@@ -67,13 +67,14 @@ public class Chunk extends Camera {
                         getTile(i, j).onDestroyTile(this, chunkX, chunkY, i, j);
                         getTile(i, j).setTransitionId(getId(i, j));
                         getTile(i, j).setImageSet(false);
+
                         updateNeighbourTransitions(i, j);
 
-                        input.setMouseLeft(false);
-                    }
+                        if (getTile(i, j).isEdgeTile()) {
+                            System.out.println("update chunk neighbour(s)");
+                        }
 
-                    if (getTile(i, j) != null && getTile(i, j).contains(input.getMouse()) && input.isMouseRight()) {
-                        input.setMouseRight(false);
+                        input.setMouseLeft(false);
                     }
                 }
             }
