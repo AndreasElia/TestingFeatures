@@ -11,6 +11,7 @@ public class GrassTile extends Tile {
 
     public GrassTile(int type, int x, int y) {
         super(type, x, y);
+
         setOffset(0, 0);
         setName("Grass");
     }
@@ -25,9 +26,10 @@ public class GrassTile extends Tile {
 
     @Override
     public void onDestroyTile(Chunk chunk, int chunkX, int chunkY, int x, int y) {
-        chunk.setTile(x, y,
-                new MudTile(Tile.mud, (chunkX * (Globals.chunkSize * Globals.tileSize)) + x * Globals.tileSize,
-                        (chunkY * (Globals.chunkSize * Globals.tileSize)) + y * Globals.tileSize));
+        int xPos = (chunkX * (Globals.chunkSize * Globals.tileSize)) + x * Globals.tileSize;
+        int yPos = (chunkY * (Globals.chunkSize * Globals.tileSize)) + y * Globals.tileSize;
+
+        chunk.setTile(x, y, new WaterTile(Tile.water, xPos, yPos));
     }
 
 }

@@ -8,6 +8,7 @@ public class WaterTile extends Tile {
 
     public WaterTile(int type, int x, int y) {
         super(type, x, y);
+
         setOffset(6, 0);
         setName("Water");
     }

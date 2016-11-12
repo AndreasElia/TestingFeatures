@@ -8,6 +8,7 @@ public class MudTile extends Tile {
 
     public MudTile(int type, int x, int y) {
         super(type, x, y);
+
         setOffset(12, 4);
         setName("Mud");
     }

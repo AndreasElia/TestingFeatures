@@ -9,8 +9,8 @@ import game.Camera;
 import game.Globals;
 import game.Utils;
 import game.level.tiles.GrassTile;
-import game.level.tiles.MudTile;
 import game.level.tiles.Tile;
+import game.level.tiles.WaterTile;
 
 public class Chunk extends Camera {
 
@@ -33,11 +33,13 @@ public class Chunk extends Camera {
 
         for (int i = 0; i < Globals.chunkSize; i++) {
             for (int j = 0; j < Globals.chunkSize; j++) {
+                int xPos = chunkX + i * Globals.tileSize;
+                int yPos = chunkY + j * Globals.tileSize;
+
                 if (Utils.randInt(0, 10) <= 1) {
-                    tiles[i][j] = new MudTile(Tile.mud, chunkX + i * Globals.tileSize, chunkY + j * Globals.tileSize);
+                    tiles[i][j] = new WaterTile(Tile.water, xPos, yPos);
                 } else {
-                    tiles[i][j] = new GrassTile(Tile.grass, chunkX + i * Globals.tileSize,
-                            chunkY + j * Globals.tileSize);
+                    tiles[i][j] = new GrassTile(Tile.grass, xPos, yPos);
                 }
             }
         }
@@ -80,9 +82,11 @@ public class Chunk extends Camera {
         for (int i = 0; i < Globals.chunkSize; i++) {
             for (int j = 0; j < Globals.chunkSize; j++) {
                 tiles[i][j].render(g);
-                g.drawRect((chunkX * (Globals.chunkSize * Globals.tileSize)) + i * Globals.tileSize,
-                        (chunkY * (Globals.chunkSize * Globals.tileSize)) + j * Globals.tileSize, Globals.tileSize,
-                        Globals.tileSize);
+
+                int xPos = (chunkX * (Globals.chunkSize * Globals.tileSize)) + i * Globals.tileSize;
+                int yPos = (chunkY * (Globals.chunkSize * Globals.tileSize)) + j * Globals.tileSize;
+
+                g.drawRect(xPos, yPos, Globals.tileSize, Globals.tileSize);
             }
         }
     }
