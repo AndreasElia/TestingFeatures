@@ -33,6 +33,8 @@ public abstract class Tile extends Camera {
     protected BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
     protected boolean imageSet = false;
 
+    protected boolean isEdgeTile = false;
+
     public Tile(int type, int x, int y) {
         setBounds(x, y, Globals.tileSize, Globals.tileSize);
 
@@ -162,6 +164,14 @@ public abstract class Tile extends Camera {
 
     public void setUnbreakable(boolean unbreakable) {
         this.unbreakable = unbreakable;
+    }
+
+    public boolean isEdgeTile() {
+        return isEdgeTile;
+    }
+
+    public void setEdgeTile(boolean isEdgeTile) {
+        this.isEdgeTile = isEdgeTile;
     }
 
 }

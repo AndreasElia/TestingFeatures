@@ -38,8 +38,12 @@ public class Chunk extends Camera {
 
                 if (Utils.randInt(0, 10) <= 1) {
                     tiles[i][j] = new WaterTile(Tile.water, xPos, yPos);
+                    
+                    // check if tile is edge tile and set boolean
                 } else {
                     tiles[i][j] = new GrassTile(Tile.grass, xPos, yPos);
+                    
+                 // check if tile is edge tile and set boolean
                 }
             }
         }
