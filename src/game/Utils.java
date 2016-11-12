@@ -28,18 +28,21 @@ public class Utils {
     public static double distanceTo(Entity one, Entity two) {
         double xd = (one.getX() + one.getWidth() / 2) - (two.getX() + two.getWidth() / 2);
         double yd = (one.getY() + one.getHeight() / 2) - (two.getY() + two.getHeight() / 2);
+
         return Math.sqrt(xd * xd + yd * yd);
     }
 
     public static double distanceTo(Tile one, Entity two) {
         double xd = (one.getBounds().getX() + one.getWidth() / 2) - (two.getBounds().getX() + two.getWidth() / 2);
         double yd = (one.getBounds().getY() + one.getHeight() / 2) - (two.getBounds().getY() + two.getHeight() / 2);
+
         return Math.sqrt(xd * xd + yd * yd);
     }
 
     public static double distanceTo(Rectangle one, Rectangle two) {
         double xd = (one.getBounds().getX() + one.getWidth() / 2) - (two.getBounds().getX() + two.getWidth() / 2);
         double yd = (one.getBounds().getY() + one.getHeight() / 2) - (two.getBounds().getY() + two.getHeight() / 2);
+
         return Math.sqrt(xd * xd + yd * yd);
     }
 
