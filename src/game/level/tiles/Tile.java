@@ -1,177 +1,221 @@
 package game.level.tiles;
 
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-
 import engine.gfx.Images;
 import engine.gfx.SpriteSheet;
 import game.Camera;
 import game.Globals;
-import game.level.Chunk;
+import game.items.ItemDrop;
+import game.level.Level;
+
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 
 public abstract class Tile extends Camera {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public static final int grass = 0;
-    public static final int water = 3;
-    public static final int mud = 11;
+	// Scenery values range from 0 - 127
+	public static final int grass = 0;
+	public static final int stone = 1;
+	public static final int power = 2;
+	public static final int water = 3;
+	public static final int redstone = 4;
+	public static final int lampOn = 5;
+	public static final int lampOff = 6;
+	public static final int dirt = 7;
+	public static final int snow = 8;
+	public static final int stoneWall = 9;
+	public static final int stoneFloor = 10;
+	public static final int mud = 11;
 
-    protected int type;
-    protected String name;
+	protected int type;
+	protected String name;
 
-    protected boolean ticks = false;
-    protected boolean updates = false;
-    protected boolean passable = true;
-    protected boolean unbreakable = false;
+	protected boolean ticks = false;
+	protected boolean updates = false;
+	protected boolean interactive = false;
+	protected boolean canInteract = true;
+	protected boolean passable = true;
 
-    protected int transitionId = 0;
-    protected int sheetOffsetX = 0;
-    protected int sheetOffsetY = 0;
+	private int transitionId = 0;
+	protected int sheetOffsetX = 0;
+	protected int sheetOffsetY = 0;
 
-    protected SpriteSheet tileSheet;
-    protected BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
-    protected boolean imageSet = false;
+	protected enum PowerStates {
+		UNPOWERED, POWERED
+	}
 
-    protected boolean isEdgeTile = false;
+	protected enum RedstoneStates {
+		DOT, LEFTRIGHT, UPDOWN, UPRIGHT, UPLEFT, PLUS, UPDOWNRIGHT, UPDOWNLEFT, UPLEFTRIGHT, DOWNLEFTRIGHT, DOWNRIGHT, DOWNLEFT
+	}
 
-    public Tile(int type, int x, int y) {
-        setBounds(x, y, Globals.tileSize, Globals.tileSize);
+	protected RedstoneStates redstoneState = RedstoneStates.DOT;
+	protected PowerStates powerState = PowerStates.UNPOWERED;
 
-        this.type = type;
-    }
+	protected SpriteSheet tileSheet;
+	protected BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
+	protected boolean imageSet = false;
 
-    public void tick() {
-    }
+	public Tile(int type, int x, int y) {
+		setBounds(x, y, Globals.tileSize, Globals.tileSize);
 
-    public void render(Graphics g) {
-        if (!isImageSet() && getOffsetX() >= 0 && getOffsetY() >= 0) {
-            Graphics gmerge = img.getGraphics();
-            int[] tiles = TilePresets.getTiles(getTransitionId());
-            int x1 = 0;
-            int y1 = 0;
+		this.type = type;
+	}
 
-            for (int i = 0; i < 4; i++) {
-                // 7, 8, 13, 14 = middle 4 tiles so...
+	public void tick() {
+	}
 
-                gmerge.drawImage(getTileSheet().getSprite(tiles[i]), (x1 * 8), (y1 * 8), 8, 8, null);
+	public void render(Graphics g) {
+		if (!isImageSet() && getOffsetX() >= 0 && getOffsetY() >= 0) {
+			Graphics gmerge = img.getGraphics();
+			int[] tiles = TilePresets.getTiles(getTransitionId());
+			int x1 = 0;
+			int y1 = 0;
 
-                x1 += 1;
+			for (int i = 0; i < 4; i++) {
+				// 7, 8, 13, 14 = middle 4 tiles so...
 
-                if (x1 == 2) {
-                    x1 = 0;
-                    y1 += 1;
-                }
-            }
-            gmerge.dispose();
-            setImageSet(true);
-        }
+				gmerge.drawImage(getTileSheet().getSprite(tiles[i]), (x1 * 8), (y1 * 8), 8, 8, null);
 
-        g.drawImage(img, x, y, width, height, null);
-    }
+				x1 += 1;
 
-    public void onUpdate(Chunk chunk, int x, int y) {
-    }
+				if (x1 == 2) {
+					x1 = 0;
+					y1 += 1;
+				}
+			}
+			gmerge.dispose();
+			setImageSet(true);
+		}
 
-    public void onDestroyTile(Chunk chunk, int chunkX, int chunkY, int x, int y) {
-    }
+		g.drawImage(img, x, y, width, height, null);
 
-    public int getType() {
-        return type;
-    }
+		// g.setColor(Color.WHITE);
+		// g.drawString("" + transitionId, x, y+g.getFontMetrics().getHeight());
+	}
 
-    public boolean isTicks() {
-        return ticks;
-    }
+	public void onUpdate(Level level, int x, int y) {
+	}
 
-    public void setTicks(boolean ticks) {
-        this.ticks = ticks;
-    }
+	public void onDestroyTile(Level level, int x, int y) {
+	}
 
-    public boolean isUpdates() {
-        return updates;
-    }
+	public ItemDrop[] onDestroy(Level level, int x, int y) {
+		return null;
+	}
 
-    public void setUpdates(boolean updates) {
-        this.updates = updates;
-    }
+	public int getType() {
+		return type;
+	}
 
-    public boolean isPassable() {
-        return passable;
-    }
+	public RedstoneStates getRedstoneState() {
+		return redstoneState;
+	}
 
-    public void setPassable(boolean passable) {
-        this.passable = passable;
-    }
+	public void setRedstoneState(RedstoneStates redstoneState) {
+		this.redstoneState = redstoneState;
+	}
 
-    public void setX(int x) {
-        this.x = x;
-    }
+	public PowerStates getPowerState() {
+		return powerState;
+	}
 
-    public void setY(int y) {
-        this.y = y;
-    }
+	public void setPowerState(PowerStates powerState) {
+		this.powerState = powerState;
+	}
 
-    public void setOffset(int x, int y) {
-        this.sheetOffsetX = x;
-        this.sheetOffsetY = y;
-        setTileSheet(new SpriteSheet(Images.tilesheet.getSheet().getSubimage(x * 8, y * 8, 48, 32), 8, 8));
-    }
+	public boolean isTicks() {
+		return ticks;
+	}
 
-    public int getOffsetX() {
-        return sheetOffsetX;
-    }
+	public void setTicks(boolean ticks) {
+		this.ticks = ticks;
+	}
 
-    public int getOffsetY() {
-        return sheetOffsetY;
-    }
+	public boolean isUpdates() {
+		return updates;
+	}
 
-    public boolean isImageSet() {
-        return imageSet;
-    }
+	public void setUpdates(boolean updates) {
+		this.updates = updates;
+	}
 
-    public void setImageSet(boolean imageSet) {
-        this.imageSet = imageSet;
-    }
+	public boolean isInteractive() {
+		return interactive;
+	}
 
-    public SpriteSheet getTileSheet() {
-        return tileSheet;
-    }
+	public void setInteractive(boolean interactive) {
+		this.interactive = interactive;
+	}
 
-    public void setTileSheet(SpriteSheet tileSheet) {
-        this.tileSheet = tileSheet;
-    }
+	public boolean isCanInteract() {
+		return canInteract;
+	}
 
-    public int getTransitionId() {
-        return transitionId;
-    }
+	public void setCanInteract(boolean canInteract) {
+		this.canInteract = canInteract;
+	}
 
-    public void setTransitionId(int transitionId) {
-        this.transitionId = transitionId;
-    }
+	public boolean isPassable() {
+		return passable;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public void setPassable(boolean passable) {
+		this.passable = passable;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setX(int x) {
+		this.x = x;
+	}
 
-    public boolean isUnbreakable() {
-        return unbreakable;
-    }
+	public void setY(int y) {
+		this.y = y;
+	}
 
-    public void setUnbreakable(boolean unbreakable) {
-        this.unbreakable = unbreakable;
-    }
+	public void setOffset(int x, int y) {
+		this.sheetOffsetX = x;
+		this.sheetOffsetY = y;
+		setTileSheet(new SpriteSheet(Images.tilesheet.getSheet().getSubimage(x * 8, y * 8, 48, 32), 8, 8));
+	}
 
-    public boolean isEdgeTile() {
-        return isEdgeTile;
-    }
+	public int getOffsetX() {
+		return sheetOffsetX;
+	}
 
-    public void setEdgeTile(boolean isEdgeTile) {
-        this.isEdgeTile = isEdgeTile;
-    }
+	public int getOffsetY() {
+		return sheetOffsetY;
+	}
+
+	public boolean isImageSet() {
+		return imageSet;
+	}
+
+	public void setImageSet(boolean imageSet) {
+		this.imageSet = imageSet;
+	}
+
+	public SpriteSheet getTileSheet() {
+		return tileSheet;
+	}
+
+	public void setTileSheet(SpriteSheet tileSheet) {
+		this.tileSheet = tileSheet;
+	}
+
+	public int getTransitionId() {
+		return transitionId;
+	}
+
+	public void setTransitionId(int transitionId) {
+		this.transitionId = transitionId;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 
 }
