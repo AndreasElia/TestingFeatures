@@ -36,33 +36,6 @@ public class Player extends Entity {
     }
 
     public void render(Graphics g) {
-        // if (facing == 1) {
-        // g.drawImage(Animation.walkUp.getTexture(Animation.walkUp.getFrame()),
-        // x, y,
-        // Images.entitysheet.getSprite(0).getWidth() * Globals.scale,
-        // Images.entitysheet.getSprite(0).getHeight() * Globals.scale, null);
-        // } else if (facing == 0) {
-        // g.drawImage(Animation.walkDown.getTexture(Animation.walkDown.getFrame()),
-        // x, y,
-        // Images.entitysheet.getSprite(0).getWidth() * Globals.scale,
-        // Images.entitysheet.getSprite(0).getHeight() * Globals.scale, null);
-        // } else if (facing == 3) {
-        // g.drawImage(Animation.walkLeft.getTexture(Animation.walkLeft.getFrame()),
-        // x, y,
-        // Images.entitysheet.getSprite(0).getWidth() * Globals.scale,
-        // Images.entitysheet.getSprite(0).getHeight() * Globals.scale, null);
-        // } else if (facing == 2) {
-        // g.drawImage(Animation.walkRight.getTexture(Animation.walkRight.getFrame()),
-        // x, y,
-        // Images.entitysheet.getSprite(0).getWidth() * Globals.scale,
-        // Images.entitysheet.getSprite(0).getHeight() * Globals.scale, null);
-        // } else {
-        // g.drawImage(Images.entitysheet.getSprite((facing == 0) ? 10 : (facing
-        // == 1) ? 0 : (facing == 3) ? 20 : 30),
-        // x, y, Images.entitysheet.getSprite(0).getWidth() * Globals.scale,
-        // Images.entitysheet.getSprite(0).getHeight() * Globals.scale, null);
-        // }
-
         g.setColor(new Color(0, 0, 255, 144));
         g.drawRect(x, y, width, height);
     }
