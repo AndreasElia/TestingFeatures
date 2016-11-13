@@ -1,166 +1,218 @@
 package engine;
 
-import engine.gfx.Images;
-import game.level.tiles.TilePresets;
-import game.screens.ScreenManager;
-
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
+import java.io.IOException;
+import java.util.Hashtable;
 
 import javax.swing.JFrame;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
+
+import engine.gfx.Images;
+import game.level.tiles.TilePresets;
+import game.screens.ScreenManager;
+import network.handlers.PacketHandler;
+
 public class Main extends Canvas implements Runnable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public static int WIDTH = 1024;
-	public static int HEIGHT = WIDTH / 16 * 9;
-	private static Dimension size = new Dimension(WIDTH - 10, HEIGHT - 10);
+    public static int WIDTH = 1024;
+    public static int HEIGHT = WIDTH / 16 * 9;
+    private static Dimension size = new Dimension(WIDTH - 10, HEIGHT - 10);
 
-	private static boolean isFullScreen = false;
+    private static boolean isFullScreen = false;
+    private boolean running = false;
 
-	private boolean running = false;
-	private Thread thread;
-	private static JFrame frame;
+    private Thread thread;
 
-	private static Input input;
-	private static ScreenManager screen;
+    private static Client client;
+    private static JFrame frame;
+    private static Input input;
+    private static ScreenManager screen;
 
-	private static String NAME = "TestingFeatures";
-	private static int FPS = 0;
-	private static int TPS = 0;
+    private static int FPS = 0;
+    private static int TPS = 0;
 
-	public Main() {
-		input = new Input();
+    public static int auth;
+    public static int currentId;
+    public static int serverID = 0;
 
-		addKeyListener(input);
-		addMouseListener(input);
-		addMouseMotionListener(input);
-		addMouseWheelListener(input);
+    public static Hashtable<Integer, Integer> ids = new Hashtable<Integer, Integer>();
 
-		screen = new ScreenManager(input);
+    public Main() {
+        input = new Input();
 
-		setPreferredSize(size);
-		setMinimumSize(size);
-		setMaximumSize(size);
+        addKeyListener(input);
+        addMouseListener(input);
+        addMouseMotionListener(input);
+        addMouseWheelListener(input);
 
-		new Images();
-		new TilePresets();
-	}
+        screen = new ScreenManager(input);
 
-	public static void main(String[] args) {
-		Main main = new Main();
+        setPreferredSize(size);
+        setMinimumSize(size);
+        setMaximumSize(size);
 
-		frame = new JFrame(NAME);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(main);
-		frame.pack();
-		frame.setResizable(false);
-		frame.setLocationRelativeTo(null);
-		frame.setIconImage(Images.othertiles.getSprite(0));
-		frame.setVisible(true);
+        new Images();
+        new TilePresets();
+    }
 
-		main.start();
-	}
+    public static void main(String[] args) {
+        Main main = new Main();
 
-	public synchronized void start() {
-		running = true;
-		thread = new Thread(this);
-		thread.start();
-	}
+        frame = new JFrame("TestingFeatures");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(main);
+        frame.pack();
+        frame.setResizable(false);
+        frame.setLocationRelativeTo(null);
+        frame.setIconImage(Images.othertiles.getSprite(0));
+        frame.setVisible(true);
 
-	public synchronized void stop() {
-		running = false;
+        main.start();
+    }
 
-		try {
-			thread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
+    public synchronized void start() {
+        running = true;
+        thread = new Thread(this);
+        thread.start();
+    }
 
-	public void tick() {
-		screen.tick();
-	}
+    public synchronized void stop() {
+        running = false;
 
-	public void render() {
-		BufferStrategy strategy = getBufferStrategy();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
-		if (strategy == null) {
-			createBufferStrategy(2);
-			return;
-		}
+    public void tick() {
+        serverID = Main.getClient().getID();
 
-		Graphics g = strategy.getDrawGraphics();
+        screen.tick();
+    }
 
-		g.setColor(new Color(0x1F282D));
-		g.fillRect(0, 0, WIDTH, HEIGHT);
+    public void render() {
+        BufferStrategy strategy = getBufferStrategy();
 
-		screen.render(g);
+        if (strategy == null) {
+            createBufferStrategy(2);
+            return;
+        }
 
-		g.dispose();
-		strategy.show();
-	}
+        Graphics g = strategy.getDrawGraphics();
 
-	@Override
-	public void run() {
-		long lastTime = System.nanoTime();
-		double unprocessed = 0;
-		double nsPerTick = 1000000000.0 / 60;
-		int ticks = 0;
-		int frames = 0;
-		long lastTimer = System.currentTimeMillis();
+        g.setColor(new Color(0x1F282D));
+        g.fillRect(0, 0, WIDTH, HEIGHT);
 
-		while (running) {
-			long now = System.nanoTime();
-			boolean shouldRender = true;
+        screen.render(g);
 
-			unprocessed += (now - lastTime) / nsPerTick;
-			lastTime = now;
+        g.dispose();
+        strategy.show();
+    }
 
-			while (unprocessed >= 1) {
-				ticks++;
-				tick();
-				unprocessed -= 1;
-				shouldRender = true;
-			}
+    @Override
+    public void run() {
+        startClient();
 
-			if (shouldRender) {
-				frames++;
-				render();
-			}
+        long lastTime = System.nanoTime();
+        double unprocessed = 0;
+        double nsPerTick = 1000000000.0 / 60;
+        int ticks = 0;
+        int frames = 0;
+        long lastTimer = System.currentTimeMillis();
 
-			if (System.currentTimeMillis() - lastTimer > 1000) {
-				lastTimer += 1000;
-				setFPS(frames);
-				setTPS(ticks);
-				ticks = 0;
-				frames = 0;
-			}
-		}
-	}
+        while (running) {
+            long now = System.nanoTime();
+            boolean shouldRender = true;
 
-	public static boolean isFullScreen() {
-		return isFullScreen;
-	}
+            unprocessed += (now - lastTime) / nsPerTick;
+            lastTime = now;
 
-	public static int getFPS() {
-		return FPS;
-	}
+            while (unprocessed >= 1) {
+                ticks++;
+                tick();
+                unprocessed -= 1;
+                shouldRender = true;
+            }
 
-	public static void setFPS(int fPS) {
-		FPS = fPS;
-	}
+            if (shouldRender) {
+                frames++;
+                render();
+            }
 
-	public static int getTPS() {
-		return TPS;
-	}
+            if (System.currentTimeMillis() - lastTimer > 1000) {
+                lastTimer += 1000;
+                setFPS(frames);
+                setTPS(ticks);
+                ticks = 0;
+                frames = 0;
+            }
+        }
+    }
 
-	public static void setTPS(int tPS) {
-		TPS = tPS;
-	}
+    public void startClient() {
+        client = new Client();
+
+        Kryo kryo = client.getKryo();
+
+        register(kryo);
+
+        client.start();
+
+        try {
+            client.connect(5000, "localhost", 54555, 54777);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        client.addListener(new Listener() {
+            public void received(Connection connection, Object object) {
+                new PacketHandler(connection, object);
+            }
+        });
+    }
+
+    public static void register(Kryo kryo) {
+        kryo.register(java.util.Hashtable.class);
+    }
+
+    public static boolean isFullScreen() {
+        return isFullScreen;
+    }
+
+    public static int getFPS() {
+        return FPS;
+    }
+
+    public static void setFPS(int fPS) {
+        FPS = fPS;
+    }
+
+    public static int getTPS() {
+        return TPS;
+    }
+
+    public static void setTPS(int tPS) {
+        TPS = tPS;
+    }
+
+    public static Client getClient() {
+        return client;
+    }
+
+    public static void setClient(Client client) {
+        Main.client = client;
+    }
 
 }
