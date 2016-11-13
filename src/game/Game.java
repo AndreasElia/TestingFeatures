@@ -150,18 +150,6 @@ public class Game {
                 g.drawString("Dev. v" + Globals.version, 16, 38);
                 g.drawString("FPS/TPS: " + Main.getFPS() + "/" + Main.getTPS(), 16, 52);
                 g.drawString("Entities: " + "n/a", 16, 66);
-                g.drawString("Biome: " + "n/a", 16, 80);
-                g.drawString("Tile: " + (level
-                        .getChunk((int) (input.getMouse().x + Game.cX) / (Globals.chunkSize * Globals.tileSize),
-                                (int) (input.getMouse().y + Game.cY) / (Globals.chunkSize * Globals.tileSize))
-                        .getTile((int) (input.getMouse().x + Game.cX) / Globals.tileSize,
-                                (int) (input.getMouse().y + Game.cY) / Globals.tileSize)),
-                        16, 94);
-                g.drawString(
-                        "Chunk: " + (level.getChunk(
-                                (int) (input.getMouse().x + Game.cX) / (Globals.chunkSize * Globals.tileSize),
-                                (int) (input.getMouse().y + Game.cY) / (Globals.chunkSize * Globals.tileSize))),
-                        16, 122);
             }
         }
     }

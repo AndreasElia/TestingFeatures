@@ -1,6 +1,5 @@
 package game.level;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
@@ -82,16 +81,9 @@ public class Chunk extends Camera {
     }
 
     public void render(Graphics g, int chunkX, int chunkY) {
-        g.setColor(Color.RED);
-
         for (int i = 0; i < Globals.chunkSize; i++) {
             for (int j = 0; j < Globals.chunkSize; j++) {
                 tiles[i][j].render(g);
-
-                int xPos = (chunkX * (Globals.chunkSize * Globals.tileSize)) + i * Globals.tileSize;
-                int yPos = (chunkY * (Globals.chunkSize * Globals.tileSize)) + j * Globals.tileSize;
-
-                g.drawRect(xPos, yPos, Globals.tileSize, Globals.tileSize);
             }
         }
     }
