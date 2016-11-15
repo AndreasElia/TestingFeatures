@@ -19,6 +19,8 @@ import engine.gfx.Images;
 import game.level.tiles.TilePresets;
 import game.screens.ScreenManager;
 import network.handlers.PacketHandler;
+import network.packets.LevelPacket;
+import network.packets.NewUserPacket;
 
 public class Main extends Canvas implements Runnable {
 
@@ -44,6 +46,8 @@ public class Main extends Canvas implements Runnable {
     public static int auth;
     public static int currentId;
     public static int serverID = 0;
+
+    public static int mapSize = 256;
 
     public static Hashtable<Integer, Integer> ids = new Hashtable<Integer, Integer>();
 
@@ -162,7 +166,7 @@ public class Main extends Canvas implements Runnable {
     }
 
     public void startClient() {
-        client = new Client();
+        client = new Client(9999999, 9999999);
 
         Kryo kryo = client.getKryo();
 
@@ -181,10 +185,17 @@ public class Main extends Canvas implements Runnable {
                 new PacketHandler(connection, object);
             }
         });
+
+        NewUserPacket newUser = new NewUserPacket();
+        Main.client.sendTCP(newUser);
     }
 
     public static void register(Kryo kryo) {
         kryo.register(java.util.Hashtable.class);
+        kryo.register(int[].class);
+        kryo.register(int[][].class);
+        kryo.register(NewUserPacket.class);
+        kryo.register(LevelPacket.class);
     }
 
     public static boolean isFullScreen() {

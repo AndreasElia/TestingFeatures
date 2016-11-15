@@ -29,7 +29,7 @@ public class Level {
 	public ScreenGeneration screenGen;
 	public boolean finishedGeneration = false;
 
-    private int[][] topMap; // set from server
+    public static int[][] topMap; // set from server
 
 	public Level(Input input) {
 		this.input = input;
